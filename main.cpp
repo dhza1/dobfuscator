@@ -5,9 +5,6 @@
 #include "funcs.h"
 #include "structs.h"
 
-
-
-
 int main() {
     obfuscate("def hello():\n\tprint('Hello, world!')");
 }
