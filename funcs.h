@@ -99,7 +99,11 @@ std::vector<std::string> find_varnames(std::string line) {
         }
     } else {
         if (line.find('=') != std::string::npos) {
-            temp.push_back(line.substr(0, line.find('=')));
+            size_t start = line.find_first_not_of(" \t"); // Skip leading spaces/tabs
+            size_t end = line.find('='); // Position of '='
+
+            std::string key = line.substr(start, end - start); // Get trimmed key
+            temp.push_back(key);
         }
     }
     return temp;
@@ -111,6 +115,41 @@ std::string obfuscate_string(const std::string& s) {
     for (char c : s) result += to_hex(c);
     return "\"" + result + "\"";
 }
+
+std::string obfNumbers(std::string str) {
+    if (str.find('=') != std::string::npos || str.find("if") == std::string::npos) {
+        std::string value = str.substr(str.find('=') + 1, str.size());
+        try {
+            if (value.find('.') != std::string::npos) {
+                ;
+            } else {
+                int val = std::stoi(value);
+
+
+                Replacement rep;
+
+                rep.name = std::to_string(val);
+
+                std::string temp;
+                for (int i = 0; i < val; ++i) {
+                    if (temp == "") {
+                        temp += "1";
+                    } else {
+                        temp += "+1";
+                    }
+                }
+                rep.replace = temp;
+
+                std::string works = replaceLine(str, {rep});
+                return works;
+            }
+        } catch (...) {
+            std::cout << "something went wrong" << std::endl;
+        }
+    }
+    return str;
+}
+
 
 std::string obfuscateStrings(std::string str) {
     bool quote = false;
@@ -159,7 +198,10 @@ void obfuscate(std::string str) {
     reps.push_back(rep);
 
     for (auto &line : lines) {
-       temp.push_back(replaceLine(line, reps));
+       std::string line_h = replaceLine(line, reps);
+       line_h = obfNumbers(line_h);
+
+       temp.push_back(line_h);
     }
     std::vector<std::string> phase2;
     for (auto &line : temp) {
