@@ -150,7 +150,6 @@ void obfuscate(std::string str) {
             reps.push_back(makerep(var));
         }
     }
-
     std::vector<std::string> temp;
 
     Replacement rep;
